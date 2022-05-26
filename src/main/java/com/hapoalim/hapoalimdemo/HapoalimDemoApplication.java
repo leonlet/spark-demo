@@ -18,12 +18,13 @@ public class HapoalimDemoApplication {
 		System.out.println("Main Started");
 		ObjectToJsonUtil utils = new ObjectToJsonUtil();
 		KafkaMessage kafkaMsg;
-		String convertedMsg;
+			String convertedMsg;
 
 		KafkaSubscriber subscriber = new KafkaSubscriber(Constants.DEFAULT_KAFKA_HOST, Constants.INPUT_TOPIC);
 		KafkaProducer producer = new KafkaProducer(Constants.DEFAULT_KAFKA_HOST);
 		ChangeDataCaptureService captureService = new ChangeDataCaptureService(producer);
 		List<String> messages = subscriber.consumeMessages(100L);
+		//Regular implementation without spark
 		for( String msg : messages)
 		{
 			convertedMsg = utils.formatKafkaMessage(msg);
@@ -33,11 +34,13 @@ public class HapoalimDemoApplication {
 		}
 		try
 		{
+			//Spark implementation
 			subscriber.SparkConsume(captureService);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			throw new RuntimeException();
 		}
 		finally
 		{
